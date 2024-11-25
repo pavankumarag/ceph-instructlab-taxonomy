@@ -1,10 +1,10 @@
 version: 3
 created_by: Krishna Ramaswamy
 domain: NVMe/TCP Initiator for Linux
-seed_examples: 
+seed_examples:
 - context: |
-      The NVMe/TCP initiator for Linux requires Kernel 5.0 or later and supported distributions such as RHEL 9.2, 
-      Ubuntu 24.04, or SLES 15 SP3. These prerequisites ensure compatibility with the NVMe-oF protocol for block 
+      The NVMe/TCP initiator for Linux requires Kernel 5.0 or later and supported distributions such as RHEL 9.2,
+      Ubuntu 24.04, or SLES 15 SP3. These prerequisites ensure compatibility with the NVMe-oF protocol for block
       storage access.
   questions_and_answers:
       - question: What is the minimum required kernel version for NVMe/TCP initiator?
@@ -17,7 +17,7 @@ seed_examples:
         answer: |
           They ensure compatibility with the NVMe-oF protocol for accessing block storage.
 - context: |
-      To set up the NVMe/TCP initiator on Linux, you need to install the `nvme-cli` package, load the NVMe-oF kernel 
+      To set up the NVMe/TCP initiator on Linux, you need to install the `nvme-cli` package, load the NVMe-oF kernel
       module, and verify the target's reachability using the `nvme discover` command.
   questions_and_answers:
       - question: How do you install the NVMe command-line utility on Linux?
@@ -30,7 +30,7 @@ seed_examples:
         answer: |
           Use the `nvme discover -t tcp -a GATEWAY_IP -s 4420` command.
 - context: |
-      After verifying the NVMe/TCP target, you can connect to it using the `nvme connect` command with the target 
+      After verifying the NVMe/TCP target, you can connect to it using the `nvme connect` command with the target
       gateway IP and subsystem NQN. This establishes the initiator-target link.
   questions_and_answers:
       - question: What command is used to connect to the NVMe/TCP target?
@@ -43,7 +43,7 @@ seed_examples:
         answer: |
           The gateway IP identifies the NVMe/TCP target to which the initiator connects.
 - context: |
-      After connecting to the NVMe/TCP target, you can list block devices using `nvme list`, create a filesystem on 
+      After connecting to the NVMe/TCP target, you can list block devices using `nvme list`, create a filesystem on
       the NVMe node path, and mount it to a directory for use.
   questions_and_answers:
       - question: How do you list the NVMe block devices after connection?
@@ -56,7 +56,7 @@ seed_examples:
         answer: |
           Mounting makes the NVMe block device accessible as a usable file system.
 - context: |
-      Once the filesystem is mounted, you can interact with the NVMe-oF storage by creating and verifying files in the 
+      Once the filesystem is mounted, you can interact with the NVMe-oF storage by creating and verifying files in the
       mounted directory. For example, create a text file and confirm its contents.
   questions_and_answers:
       - question: How do you create a directory for mounting NVMe storage?
