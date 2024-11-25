@@ -1,10 +1,10 @@
 version: 3
 created_by: Krishna Ramaswamy
 domain: Ceph NVMe-oF Overview
-seed_examples: 
+seed_examples:
 - context: |
-      The Ceph NVMe-oF Gateway exports RADOS Block Device (RBD) images as NVMe namespaces, enabling clients without 
-      native Ceph support to access Ceph block storage. It uses the NVMe-oF protocol to send NVMe commands over a 
+      The Ceph NVMe-oF Gateway exports RADOS Block Device (RBD) images as NVMe namespaces, enabling clients without
+      native Ceph support to access Ceph block storage. It uses the NVMe-oF protocol to send NVMe commands over a
       TCP/IP network, integrating Ceph into conventional storage infrastructures.
   questions_and_answers:
       - question: What does the Ceph NVMe-oF Gateway export?
