@@ -1,7 +1,7 @@
 version: 3
 created_by: Krishna Ramaswamy
 domain: NVME-oF Gateway Requirements
-seed_examples: 
+seed_examples:
     - context: |
             To implement a highly-available Ceph NVMe/TCP solution, provision at least two NVMe/TCP gateways on different
             nodes. This ensures fault tolerance and seamless operation by eliminating single points of failure. Proper
