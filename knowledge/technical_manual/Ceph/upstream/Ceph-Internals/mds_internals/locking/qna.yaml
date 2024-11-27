@@ -1,0 +1,160 @@
+version: 3
+created_by: Pavan Govindraj
+domain: opensource_storage
+document_outline: Teach the Large Language Model about the locking of Ceph MDS internals
+document:
+  repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
+  commit: b60d0d0
+  patterns: [/upstream/doc/dev/mds_internals/locking*.md]
+seed_examples:
+  - context: |
+      Ceph MDS Locker Why use locks? Locking infrastructure in MDS is (obviously) to
+      protect the state of various metadata. MDS has different locks covering different portions of inode and dentry.
+      Moreover, MDS uses different kinds of locks since different metadata (in inode and dentry) have different behaviour
+      in different situations. The MDS cache is distributed across multiple MDS ranks and across all clients. The locking
+      infrastructure serves to ensure that all ranks and clients are consistent in their view of the file system."
+    questions_and_answers:
+      - question: Why is a locking mechanism necessary in Ceph MDS?
+        answer: A locking mechanism is crucial in Ceph MDS to ensure data consistency and prevent race conditions.
+          It protects the state of various metadata, such as inodes and dentries, which are distributed across multiple
+          MDS ranks and clients.This ensures that all nodes have a consistent view of the file system.
+      - question: What types of locks are used in Ceph MDS?
+        answer: Ceph MDS employs different types of locks to protect various metadata structures. These locks are designed to
+          handle different scenarios and ensure data integrity. The specific types of locks and their usage depend
+          on the nature of the metadata being accessed.
+      - question: How does the locking mechanism ensure consistency across multiple MDS ranks and clients?
+        answer: The locking mechanism in Ceph MDS coordinates access to shared metadata structures. When a rank or client needs
+          to modify metadata, it acquires the appropriate lock. This prevents concurrent modifications and ensures that changes
+          are applied in a consistent order. By coordinating access in this way, the locking mechanism maintains a consistent
+          view of the file system across all nodes.
+  - context: |
+      Data managed by the MDS can be very large to practically have the entire data set in the memory of a single metadata server.
+      This also results in a single point of failure. The MDS therefore has a concept of Distributed Subtree Partition.
+      A directory tree can be divided into smaller sub-trees. This is done by recording heat (access frequency) of
+      each node in the directory tree. When a sub-tree heat reaches a configured threshold, the MDS divides the
+      sub-tree by splitting the directory fragment. Each fragment is responsible for a part of the original directory,
+      however, there will be a single authority node for these fragments. Each MDS can bear the read and write requests after
+      fragmentation. If a file is very frequently accessed, the MDS will generate multiple copies distributed across active MDSs
+      to satisfy concurrent I/Os. Typically, there are multiple clients reading and writing to files. The MDS defines locking rules
+      for the associated metadata, e.g., metadata which is rarely modified concurrently such as UID/GID for an inode, a shared read
+      and exclusive write access rule would suffice. However, statistics of a directory may need to be updated by multiple clients at
+      the same time. This large directory may have been divided (fragmented) into multiple shards and different clients could write to different
+      shards. These shards can share the read and also support simultaneous writes.
+    questions_and_answers:
+      - question: How does Ceph MDS handle large datasets to avoid single points of failure?
+        answer: Ceph MDS employs Distributed Subtree Partitioning, which divides large directory trees into smaller sub-trees.
+          This approach distributes the load across multiple MDS ranks, reducing the risk of single points of failure and improving performance.
+      - question: How does Ceph MDS handle concurrent access to frequently accessed files?
+        answer: To handle concurrent access to frequently accessed files, Ceph MDS generates multiple copies of the file's metadata,
+          distributing them across active MDSs. This allows multiple clients to read and write the file simultaneously,
+          improving performance and reducing latency.
+      - question: How does Ceph MDS ensure data consistency and prevent conflicts when multiple clients access the same metadata?
+        answer: Ceph MDS uses a sophisticated locking mechanism to coordinate access to shared metadata structures.
+          Different types of locks are employed based on the nature of the metadata and the desired level of concurrency.
+          By carefully managing locks, Ceph MDS ensures data integrity and prevents inconsistencies.
+  - context: |
+      Read, Write and Exclusive Locks
+      There are 3 modes in which a lock can be acquired:
+
+      rdlock - shared read lock
+      wrlock - shared write lock
+      xlock  - exclusive lock
+      [rdlock]{.title-ref} and [xlock]{.title-ref} are self explanatory.
+
+      [wrlock]{.title-ref} is special since it allows concurrent writers and is valid for [ScatterLock]{.title-ref} and [FileLock]{.title-ref} class.
+      From the earlier section it can be seen that [INEST]{.title-ref} and [IDFT]{.title-ref} are of [ScatterLock]{.title-ref} class.
+      [wrlock]{.title-ref} allows multiple writers at the same time, .e.g., when a (large) directory is split into multiple shards
+      (after fragmentation) and each shard is "assigned" to an active MDS. When new files are created under these directories, the recursive stats are
+      independently updated on the active MDSs. Later, to fetch the updated stats, the "scattered" data is aggregated ("gathered") on the auth MDS (of the inode);
+      which typically happens when a [rdlock]{.title-ref} is requested on this lock type.
+
+      :::: note ::: title Note :::
+
+      MDS also defines [remote_wrlock]{.title-ref} which is primarily used during rename operations when the destination dentry is on another (active) MDS than
+      the source MDS. ::::
+    questions_and_answers:
+      - question: What are the different types of locks used in Ceph MDS?
+        answer: |
+          Ceph MDS uses three main types of locks: read locks (rdlock), write locks (wrlock), and exclusive locks (xlock).
+          Each lock type has specific characteristics and is used for different purposes.
+      - question: What is the purpose of a shared write lock (wrlock)?
+        answer: A shared write lock (wrlock) allows multiple writers to concurrently modify different parts of a shared resource,
+          such as a directory that has been fragmented into multiple shards. This is particularly useful for operations like creating
+          new files or updating directory statistics.
+      - question: How does the remote_wrlock work in Ceph MDS?
+        answer: A remote write lock (remote_wrlock) is used during rename operations when the source and destination dentries reside on
+          different MDSs. It ensures that the rename operation is performed atomically and consistently across the involved MDSs.
+  - context: |
+      Lock States and Lock State Machine
+      MDS defines various lock states (defined in [src/mds/locks.h]{.title-ref} source). Not all lock states are valid for a given lock class.
+      Each lock class defines its own lock transition rules and are organized as Lock State Machines. The lock states ([LOCK_*]{.title-ref})
+      are not locks themselves, but control if a lock is allowed to be taken. Each state follows [LOCK_<STATE>]{.title-ref} or [LOCK_<FROM_STATE>_<TO_STATE>]{.title-ref}
+      naming terminology and can be summed up as:
+
+      LOCK_SYNC  - anybody (ANY) can read lock, no one can write lock and exclusive lock
+      LOCK_LOCK  - no one can read lock, only primary (AUTH) mds can write lock or exclusive lock
+      LOCK_MIX   - anybody (ANY) can write lock, no one can read lock or exclusive lock
+      LOCK_XLOCK - someone (client) is holding a exclusive lock
+      The Lock Transition table (section) use the following notions:
+
+      ANY  - Auth or Replica MDS
+      AUTH - Auth MDS
+      XCL  - Auth MDS or Exclusive client
+      Other lock states (such as [LOCK_XSYN]{.title-ref}, [LOCK_TSYN]{.title-ref}, etc..) are additional states that are defined as an optimization for certain client behaviour
+      ([LOCK_XSYN]{.title-ref} allows clients to keep the buffered writes and not flush it to the OSDs and temporarily pausing writes).
+    questions_and_answers:
+      - question: What are the different lock states in Ceph MDS?
+        answer: Ceph MDS defines various lock states such as LOCK_SYNC, LOCK_LOCK, LOCK_MIX, LOCK_XLOCK, LOCK_XSYN, and LOCK_TSYN.
+          These states control the access to metadata and ensure data consistency.
+      - question: How do the lock states control access to metadata?
+        answer: Lock states determine who can acquire a lock on a particular metadata object. For example, the LOCK_SYNC state allows
+          any MDS to acquire a read lock, but no write or exclusive locks are allowed. The LOCK_XLOCK state, on the other hand,
+          indicates that an exclusive lock is held by a client, preventing any other access.
+      - question: What is the purpose of the LOCK_XSYN and LOCK_TSYN states?
+        answer: These states are optimization states that allow clients to temporarily pause writes or buffer writes without releasing the lock.
+          This can improve performance and reduce network traffic.
+  - context: |
+      Lock Transition
+      Transition of lock from one state to another is mostly prompted by a (client) request or a change that the MDS is undergoing, such as tree migration.
+      Let's consider a simple case of two clients: One client does a [stat()]{.title-ref} ([getattr()]{.title-ref} or [lookup()]{.title-ref}) to fetch UID/GID
+      of a inode, and the other client does a [setattr()]{.title-ref} to change the UID/GID of the same inode. The first client (most likely) has [As]{.title-ref}
+      (iauth shared) caps issued to it by the MDS. Now, when the other client does a [setattr()]{.title-ref} call to the MDS, the MDS adds a [xlock]{.title-ref} to the
+      inodes' [authlock]{.title-ref} ([CEPH_LOCK_IAUTH]{.title-ref}):
+
+      Server::handle_client_setattr()
+          if (mask & (CEPH_SETATTR_MODE|CEPH_SETATTR_UID|CEPH_SETATTR_GID|CEPH_SETATTR_BTIME|CEPH_SETATTR_KILL_SGUID))
+            lov.add_xlock(&cur->authlock);
+      Note that the MDS adds a bunch of other locks for this inode, but for now let's only work on IAUTH. Now, [CEPH_LOCK_IAUTH]{.title-ref} is a
+      [SimpleLock]{.title-ref} class, and its lock transition state machine is:
+
+      // stable     loner  rep state  r     rp   rd   wr   fwr  l    x    caps,other
+      [LOCK_SYNC]      = { 0,         false, LOCK_SYNC, ANY,  0,   ANY, 0,   0,   ANY, 0,   CEPH_CAP_GSHARED,0,0,CEPH_CAP_GSHARED },
+      [LOCK_LOCK_SYNC] = { LOCK_SYNC, false, LOCK_LOCK, AUTH, XCL, XCL, 0,   0,   XCL, 0,   0,0,0,0 },
+      [LOCK_EXCL_SYNC] = { LOCK_SYNC, true,  LOCK_LOCK, 0,    0,   0,   0,   XCL, 0,   0,   0,CEPH_CAP_GSHARED,0,0 },
+      [LOCK_SNAP_SYNC] = { LOCK_SYNC, false, LOCK_LOCK, 0,    0,   0,   0,   AUTH,0,   0,   0,0,0,0 },
+
+      [LOCK_LOCK]      = { 0,         false, LOCK_LOCK, AUTH, 0,   REQ, 0,   0,   0,   0,   0,0,0,0 },
+      [LOCK_SYNC_LOCK] = { LOCK_LOCK, false, LOCK_LOCK, ANY,  0,   0,   0,   0,   0,   0,   0,0,0,0 },
+      [LOCK_EXCL_LOCK] = { LOCK_LOCK, false, LOCK_LOCK, 0,    0,   0,   0,   XCL, 0,   0,   0,0,0,0 },
+
+      [LOCK_PREXLOCK]  = { LOCK_LOCK, false, LOCK_LOCK, 0,    XCL, 0,   0,   0,   0,   ANY, 0,0,0,0 },
+      [LOCK_XLOCK]     = { LOCK_SYNC, false, LOCK_LOCK, 0,    XCL, 0,   0,   0,   0,   0,   0,0,0,0 },
+      [LOCK_XLOCKDONE] = { LOCK_SYNC, false, LOCK_LOCK, XCL,  XCL, XCL, 0,   0,   XCL, 0,   0,0,CEPH_CAP_GSHARED,0 },
+      [LOCK_LOCK_XLOCK]= { LOCK_PREXLOCK,false,LOCK_LOCK,0,   XCL, 0,   0,   0,   0,   XCL, 0,0,0,0 },
+
+      [LOCK_EXCL]      = { 0,         true,  LOCK_LOCK, 0,    0,   REQ, XCL, 0,   0,   0,   0,CEPH_CAP_GEXCL|CEPH_CAP_GSHARED,0,0 },
+      [LOCK_SYNC_EXCL] = { LOCK_EXCL, true,  LOCK_LOCK, ANY,  0,   0,   0,   0,   0,   0,   0,CEPH_CAP_GSHARED,0,0 },
+      [LOCK_LOCK_EXCL] = { LOCK_EXCL, false, LOCK_LOCK, AUTH, 0,   0,   0,   0,   0,   0,   CEPH_CAP_GSHARED,0,0,0 },
+
+      [LOCK_REMOTEXLOCK]={ LOCK_LOCK, false, LOCK_LOCK, 0,    0,   0,   0,   0,   0,   0,   0,0,0,0 },
+      context: Ceph MDS Lock Transitions
+    questions_and_answers:
+      - question: What triggers a lock state transition in Ceph MDS?
+        answer: Lock state transitions are primarily triggered by client requests or internal MDS operations, such as tree migration.
+      - question: How does the `setattr()` operation affect the lock state of an inode?
+        answer: When a client performs a `setattr()` operation, the MDS acquires an exclusive lock (xlock) on the inode's `authlock`
+          to ensure exclusive access while modifying the inode's attributes.
+      - question: What are the different lock states and their significance in Ceph MDS?
+        answer: Ceph MDS defines various lock states, such as `LOCK_SYNC`, `LOCK_LOCK`, `LOCK_MIX`, `LOCK_XLOCK`, etc., to control
+          access to metadata. These states determine who can acquire locks (any MDS, the authority MDS, or an exclusive client) and
+          the type of lock (read, write, or exclusive).

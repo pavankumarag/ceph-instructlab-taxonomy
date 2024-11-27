@@ -1,0 +1,4 @@
+Title of work: Devices Module
+Link to work: https://docs.ceph.com/en/latest/dev/mds_internals/locking/
+License of the work: Apache 2.0
+Creators name: Pavan Govindraj
