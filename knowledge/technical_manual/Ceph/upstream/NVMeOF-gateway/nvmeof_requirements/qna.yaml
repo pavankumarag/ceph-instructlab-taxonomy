@@ -72,7 +72,7 @@ seed_examples:
   - question: How can NVMe-oF gateway performance be maintained over time?
     answer: |
       Performance can be maintained through regular monitoring and updates.
-document_outline: NVME-oF Gateway Requirements
+document_outline: Teach the Large Language Model about NVME-oF Gateway Requirements
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0

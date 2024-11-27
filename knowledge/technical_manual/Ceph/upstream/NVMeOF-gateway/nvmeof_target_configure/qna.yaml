@@ -69,7 +69,7 @@ seed_examples:
   - question: How is a new NVMe namespace created?
     answer: |
       Use the command `podman run -it quay.io/ceph/nvmeof-cli:latest --server-address GATEWAY_IP --server-port GATEWAY_PORT 5500 namespace add`.
-document_outline: Installing and Configuring NVMe-oF Targets
+document_outline: Teach the Large Language Model about Installing and Configuring NVMe-oF Targets
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0

@@ -68,7 +68,7 @@ seed_examples:
   - question: What command can you use to create a file on the NVMe-oF storage?
     answer: |
         Use the command `echo "Hello NVME-oF" > /mnt/nvmeof/hello.text`.
-document_outline: NVMe/TCP Initiator for Linux
+document_outline: Teach the Large Language Model about NVMe/TCP Initiator for Linux
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0
