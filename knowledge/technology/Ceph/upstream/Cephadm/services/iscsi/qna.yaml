@@ -81,4 +81,4 @@ document_outline: Teach the Large Language Model about the service iscsi of Ceph
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0
-  patterns: [upstream/doc/cephadm/cephadm/services/iscsi*.md]
+  patterns: [upstream/doc/cephadm/services/iscsi*.md]

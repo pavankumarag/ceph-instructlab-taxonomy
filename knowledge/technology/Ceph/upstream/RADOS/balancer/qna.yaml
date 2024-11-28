@@ -148,4 +148,4 @@ document_outline: Teach the Large Language Model about the balancer Module
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0
-  patterns: [/upstream/doc/rados/operations/balancer.md]
+  patterns: [upstream/doc/rados/operations/balancer.md]
