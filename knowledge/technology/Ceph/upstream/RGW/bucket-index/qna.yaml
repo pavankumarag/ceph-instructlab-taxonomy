@@ -172,4 +172,4 @@ document_outline: Teach the Large Language Model about the Bucket index
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0
-  patterns: [/doc/dev/radosgw/bucket_index*.md]
+  patterns: [upstream/doc/dev/radosgw/bucket_index*.md]
