@@ -93,4 +93,4 @@ document_outline: Teach the Large Language Model about the host management featu
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0
-  patterns: [upstream/doc/cephadm/cephadm/host-management*.md]
+  patterns: [upstream/doc/cephadm/host-management*.md]

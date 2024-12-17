@@ -121,4 +121,4 @@ document_outline: Teach the Large Language Model about the service snmp-gateway 
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0
-  patterns: [upstream/doc/cephadm/cephadm/services/snmp-gateway*.md]
+  patterns: [upstream/doc/cephadm/services/snmp-gateway*.md]

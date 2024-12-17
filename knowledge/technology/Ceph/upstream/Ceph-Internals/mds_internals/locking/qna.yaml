@@ -5,7 +5,7 @@ document_outline: Teach the Large Language Model about the locking of Ceph MDS i
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
   commit: b60d0d0
-  patterns: [/upstream/doc/dev/mds_internals/locking*.md]
+  patterns: [upstream/doc/dev/mds_internals/locking*.md]
 seed_examples:
   - context: |
       Ceph MDS Locker Why use locks? Locking infrastructure in MDS is (obviously) to
