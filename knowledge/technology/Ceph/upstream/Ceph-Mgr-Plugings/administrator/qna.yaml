@@ -1,0 +1,112 @@
+version: 3
+created_by: Fredolin B Brone
+domain: opensource_storage
+seed_examples:
+  - context: |
+      Manual Setup
+      To set up a ceph-mgr daemon manually, create an authentication key using:
+      ceph auth get-or-create mgr.$name mon 'allow profile mgr' osd 'allow *' mds 'allow *'
+      Place the keyring file in the mgr data path, such as /var/lib/ceph/mgr/ceph-$name/keyring.
+      Start the ceph-mgr daemon with:
+      ceph-mgr -i $name
+      Verify the daemon status using:
+      ceph status
+      Check for a mgr active status line.
+    questions_and_answers:
+      - question: |
+          How do you create an authentication key for ceph-mgr?
+        answer: |
+          Use the command: ceph auth get-or-create mgr.$name mon 'allow profile mgr' osd 'allow *' mds 'allow *'.
+      - question: |
+          Where should the keyring file be placed?
+        answer: |
+          Place it in /var/lib/ceph/mgr/ceph-$name/keyring.
+      - question: |
+          How can you verify the ceph-mgr daemon status?
+        answer: |
+          Use the command: ceph status and check for a mgr active status line.
+  - context: |
+      Client Authentication
+      The ceph-mgr daemon needs CephX capabilities. In older clusters or custom setups, grant permissions by adding
+      "mgr allow *" to the client's CephX capabilities to avoid EACCES errors.
+    questions_and_answers:
+      - question: |
+          Why might you encounter EACCES errors with ceph-mgr?
+        answer: |
+          You might lack proper CephX capabilities for the client.
+      - question: |
+          How do you fix authentication errors for ceph-mgr?
+        answer: |
+          Add "mgr allow *" to the client's CephX capabilities.
+      - question: |
+          When is adding CephX capabilities necessary?
+        answer: |
+          When using custom tools or upgrading from an old Ceph version.
+  - context: |
+      High Availability
+      Deploy ceph-mgr on hosts running ceph-mon for better availability. Monitors activate the first ceph-mgr that starts.
+      Others remain on standby. If the active daemon fails, it is replaced by a standby after a grace period.
+      Use ceph mgr fail  to manually mark a daemon as failed.
+    questions_and_answers:
+      - question: |
+          Why should ceph-mgr be deployed on hosts running ceph-mon?
+        answer: |
+          To ensure high availability with automatic failover.
+      - question: |
+          What happens if the active ceph-mgr fails?
+        answer: |
+          It is replaced by a standby after the configured grace period.
+      - question: |
+          How can you manually mark a ceph-mgr daemon as failed?
+        answer: |
+          Use the command: ceph mgr fail .
+  - context: |
+      Performance and Scalability
+      Enable caching using:
+      ceph config set mgr mgr_ttl_cache_expire_seconds
+      Set TTL to 10 seconds for clusters with 500+ OSDs or 10k+ PGs to reduce latency.
+      Use:
+      ceph daemon mgr.$MGRNAME perf dump
+      to retrieve performance metrics, including cache hit/miss ratios.
+    questions_and_answers:
+      - question: |
+          How do you enable caching in ceph-mgr?
+        answer: |
+          Use: ceph config set mgr mgr_ttl_cache_expire_seconds.
+      - question: |
+          When is enabling caching recommended?
+        answer: |
+          When there are 500+ OSDs or 10k+ PGs in the cluster.
+      - question: |
+          How can you check the cache hit/miss ratio in ceph-mgr?
+        answer: |
+          Use: ceph daemon mgr.$MGRNAME perf dump.
+  - context: |
+      Using Modules
+      List available and enabled modules with:
+      ceph mgr module ls
+      Enable a module using:
+      ceph mgr module enable
+      Disable a module using:
+      ceph mgr module disable
+      Use:
+      ceph mgr services
+      to view module addresses.
+    questions_and_answers:
+      - question: |
+          How do you list available and enabled modules in ceph-mgr?
+        answer: |
+          Use the command: ceph mgr module ls.
+      - question: |
+          How can you enable a module in ceph-mgr?
+        answer: |
+          Use the command: ceph mgr module enable .
+      - question: |
+          How can you view the addresses of enabled modules?
+        answer: |
+          Use the command: ceph mgr services.
+document_outline: Teach the Large Language Model about the Crash Module
+document:
+  repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
+  commit: b60d0d0
+  patterns: [upstream/doc/mgr/administrator.md]
