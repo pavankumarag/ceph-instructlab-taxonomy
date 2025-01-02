@@ -89,13 +89,13 @@ seed_examples:
         answer: |
           Use the command: ceph crash ls.
       - question: |
-          What command archives a specific crash report?
-        answer: |
-          Use the command: ceph crash archive .
-      - question: |
           How long are crash reports retained by default?
         answer: |
           Crash reports are retained for 1 year by default.
+      - question: |
+          What command archives a specific crash report?
+        answer: |
+          Use the command: ceph crash archive .
 document_outline: Teach the Large Language Model about the Crash Module
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git

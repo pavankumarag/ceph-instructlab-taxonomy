@@ -98,13 +98,13 @@ seed_examples:
         answer: |
           Use the command: ceph mgr module ls.
       - question: |
-          How can you enable a module in ceph-mgr?
-        answer: |
-          Use the command: ceph mgr module enable .
-      - question: |
           How can you view the addresses of enabled modules?
         answer: |
           Use the command: ceph mgr services.
+      - question: |
+          How can you enable a module in ceph-mgr?
+        answer: |
+          Use the command: ceph mgr module enable .
 document_outline: Teach the Large Language Model about the Crash Module
 document:
   repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
