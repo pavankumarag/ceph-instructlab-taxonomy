@@ -57,12 +57,12 @@ seed_examples:
         answer: |
           Use the command: ceph auth get-or-create client.crash mon 'profile crash' mgr 'profile crash'.
   - context: |
-      The crash module provides vital functionality for managing crashdumps in the Ceph cluster. Crash dumps 
-      include metadata and logs related to daemon failures, stored for analysis and debugging. By default, 
-      crash dumps are saved in /var/lib/ceph/crash and contain a meta file with detailed information. 
+      The crash module provides vital functionality for managing crashdumps in the Ceph cluster. Crash dumps
+      include metadata and logs related to daemon failures, stored for analysis and debugging. By default,
+      crash dumps are saved in /var/lib/ceph/crash and contain a meta file with detailed information.
       Crash reports can be archived or removed based on their status.
-      Administrators can configure the retention period using the mgr/crash/retain_interval option. Additionally, 
-      the mgr/crash/warn_recent_interval setting determines the time period for reporting recent crashes. These 
+      Administrators can configure the retention period using the mgr/crash/retain_interval option. Additionally,
+      the mgr/crash/warn_recent_interval setting determines the time period for reporting recent crashes. These
       options are crucial for maintaining an efficient crash reporting system without overburdening storage.
     questions_and_answers:
       - question: |
