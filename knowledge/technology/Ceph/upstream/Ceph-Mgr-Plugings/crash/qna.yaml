@@ -66,17 +66,17 @@ seed_examples:
       options are crucial for maintaining an efficient crash reporting system without overburdening storage.
     questions_and_answers:
       - question: |
-          What is the purpose of the meta file in crash dumps?
+          Where are crashdumps stored by default?
         answer: |
-          The meta file contains detailed metadata about the crash, which is essential for analysis and debugging.
+          Crashdumps are stored in /var/lib/ceph/crash by default.
       - question: |
-          How can the retention period for crash reports be configured?
+          How are crashdump directories named?
         answer: |
-          The retention period can be configured using the mgr/crash/retain_interval option.
+          Directories are named by timestamp, date, and a randomly generated UUID.
       - question: |
-          What does the mgr/crash/warn_recent_interval option control?
+          What service automates crashdump uploads?
         answer: |
-          It controls the time period that defines "recent" crashes for raising the RECENT_CRASH health warning.
+          The ceph-crash.service automates crashdump uploads.
   - context: |
       Useful commands include:
       - ceph crash post -i : Save a crash dump.
