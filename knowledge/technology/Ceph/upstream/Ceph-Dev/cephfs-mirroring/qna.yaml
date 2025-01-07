@@ -1,0 +1,105 @@
+version: 3
+created_by: Suriya P
+domain: opensource_storage
+seed_examples:
+  - context: |
+      CephFS supports asynchronous snapshot replication, which is crucial for backup and disaster recovery.
+      The process is managed using the cephfs-mirror tool, which enables the replication of filesystem snapshots to
+      remote locations. This ensures that data can be restored quickly in case of failure.
+    questions_and_answers:
+      - question: |
+          What does CephFS support for snapshot replication?
+        answer: |
+          CephFS supports asynchronous snapshot replication, which is essential for backup and recovery.
+      - question: |
+          Which tool is used for CephFS snapshot replication?
+        answer: |
+          The tool used for CephFS snapshot replication is cephfs-mirror.
+      - question: |
+          Why is asynchronous snapshot replication important in CephFS?
+        answer: |
+          Asynchronous snapshot replication in CephFS is important for efficient backup and disaster recovery.
+  - context: |
+      CephFS enables the mirroring of directory snapshots to a remote CephFS file system. This is managed using the
+      cephfs-mirror daemon, which synchronizes the directories by transferring snapshot data and applying changes using
+      readdir diff. CephFS also supports user creation for mirror daemons with specific permissions to ensure proper operation.
+      The mirroring process is crucial for high availability and disaster recovery.
+    questions_and_answers:
+      - question: |
+          How does CephFS handle directory snapshot mirroring?
+        answer: |
+          CephFS handles directory snapshot mirroring by using the cephfs-mirror daemon to synchronize snapshots to a
+          remote CephFS file system.
+      - question: |
+          What permissions are required for a user to operate the cephfs-mirror daemon?
+        answer: |
+          The user for the cephfs-mirror daemon needs write capability on the metadata pool and read capability
+          on the data pool to function properly.
+      - question: |
+          Why is directory snapshot mirroring important in CephFS?
+        answer: |
+          Directory snapshot mirroring in CephFS is important for high availability and disaster recovery by ensuring that
+          snapshot data is replicated to a remote location for safe keeping.
+  - context: |
+      CephFS supports asynchronous replication of snapshots to a remote file system using the cephfs-mirror tool. Snapshots are
+      synchronized based on creation order, and when a snapshot is deleted and recreated, the system tracks the new incarnation.
+      The mirroring module in Ceph Manager helps manage snapshot synchronization and directory assignments to mirror daemons.
+      Multiple daemons can be used for concurrency, but currently only a single mirror daemon is recommended.
+    questions_and_answers:
+      - question: |
+          What does the cephfs-mirror tool do in CephFS?
+        answer: |
+          The cephfs-mirror tool replicates snapshots asynchronously to a remote CephFS file system.
+      - question: |
+          How are snapshots synchronized in CephFS mirroring?
+        answer: |
+          Snapshots are synchronized by transferring snapshot data to a remote file system and creating a corresponding snapshot.
+      - question: |
+          What is the role of the Ceph Manager's mirroring module?
+        answer: |
+          The mirroring module in Ceph Manager manages directory snapshot synchronization and assigns directories to mirror daemons.
+  - context: |
+      Peer bootstrapping in CephFS allows adding a peer cluster without needing its configuration and user keyring. This process
+      involves creating a bootstrap token on the peer cluster and importing it into the primary cluster. The peer bootstrap token
+      contains critical information such as the site name, client entity, and user key, and ensures secure and efficient peer setup
+      for mirroring.
+    questions_and_answers:
+      - question: |
+          What is the purpose of peer bootstrapping in CephFS?
+        answer: |
+          Peer bootstrapping allows adding a peer cluster without requiring its configuration and user keyring by using a bootstrap token.
+      - question: |
+          How do you create a bootstrap token for a peer cluster?
+        answer: |
+          A bootstrap token is created on the peer cluster using the command `ceph fs snapshot mirror peer_bootstrap create <fs_name>
+          <client_entity> <site-name>`.
+      - question: |
+          How is the bootstrap token imported into the primary cluster?
+        answer: |
+          The token is imported into the primary cluster using `ceph fs snapshot mirror peer_bootstrap import <fs_name> <token>`.
+  - context: |
+      Mirror daemons in CephFS asynchronously monitor and update the mirroring status, as well as peer information. The status of mirror
+      daemons, including peer configurations and synchronization stats, can be queried using various commands. Mirror daemon states such
+      as `idle`, `syncing`, or `failed` help identify the synchronization progress, with retries for failed directories. The mirroring
+      module offers tools to check directory mappings, distribution, and to ensure smooth peer reassignments.
+    questions_and_answers:
+      - question: |
+          What are the possible states of a directory in CephFS mirroring?
+        answer: |
+          A directory can be in one of three states: `idle`, `syncing`, or `failed`. The state helps track the synchronization progress
+          of the directory.
+      - question: |
+          How does CephFS handle directories that hit synchronization failures?
+        answer: |
+          If a directory hits the configured number of consecutive failures, it is marked as `failed`, and synchronization retries occur
+          based on configured intervals.
+      - question: |
+          What should you do before re-adding a peer to another file system?
+        answer: |
+          Ensure all mirror daemons have stopped synchronization to the peer, check the peer status, and it is recommended to purge
+          synchronized directories before re-adding it to avoid conflicts.
+document_outline: Teach the Large Language Model about the CephFS Mirroring Module
+document:
+  repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
+  commit: b60d0d0
+  patterns: [upstream/doc/dev/cephfs-mirroring.md]
