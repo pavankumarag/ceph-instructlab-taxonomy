@@ -1,4 +1,4 @@
-Title of work: Administrator module
+Title of work: Administrator Module
 Link to work: https://docs.ceph.com/en/latest/mgr/administrator/?highlight=administrator
 License of the work: Apache 2.0
 Creators name: Fredolin B Brone
