@@ -1,0 +1,203 @@
+version: 3
+created_by: Pentakota Divya Gowri
+domain: opensource_storage
+seed_examples:
+  - context: |
+      Device management allows Ceph to address hardware failure. Ceph tracks
+      hardware storage devices (HDDs, SSDs) to see which devices are managed
+      by which daemons. Ceph also collects health metrics about these devices.
+      By doing so, Ceph can provide tools that predict hardware failure and
+      can automatically respond to hardware failure.
+    questions_and_answers:
+      - question: |
+          What does device management in Ceph do?
+        answer: |
+          Device management in Ceph tracks hardware storage devices and collects
+          health metrics to predict and respond to hardware failure.
+      - question: |
+          How does Ceph predict hardware failure?
+        answer: |
+          Ceph predicts hardware failure by analyzing health metrics collected
+          from storage devices.
+      - question: |
+          What types of devices does Ceph track?
+        answer: |
+          Ceph tracks hardware storage devices like HDDs and SSDs.
+
+  - context: |
+      To see a list of the storage devices that are in use, run the following
+      command:
+
+      ceph device ls
+
+      Alternatively, to list devices by daemon or by host, run a command of
+      one of the following forms:
+
+      ceph device ls-by-daemon <daemon>
+      ceph device ls-by-host <host>
+
+      To see information about the location of an specific device and about
+      how the device is being consumed, run a command of the following form:
+
+      ceph device info <devid>
+    questions_and_answers:
+      - question: |
+          How can I list the storage devices in use by Ceph?
+        answer: |
+          You can list the devices using the command `ceph device ls`.
+      - question: |
+          How can I list devices by daemon or by host?
+        answer: |
+          Use `ceph device ls-by-daemon <daemon>` or `ceph device ls-by-host <host>`.
+      - question: |
+          How do I get detailed information about a specific device?
+        answer: |
+          Use the command `ceph device info <devid>` to see detailed information.
+
+  - context: |
+      To make the replacement of failed disks easier and less error-prone, you
+      can (in some cases) "blink" the drive's LEDs on hardware enclosures by
+      running a command of the following form:
+
+      device light on|off <devid> [ident|fault] [--force]
+
+      Note: Using this command to blink the lights might not work. Whether it works
+      will depend upon such factors as your kernel revision, your SES firmware,
+      or the setup of your HBA.
+
+      The `<devid>` parameter is the device identification. To retrieve this
+      information, run the following command:
+
+      ceph device ls
+
+      The `[ident|fault]` parameter determines which kind of light will blink.
+      By default, the identification light is used.
+
+      This command works only if the Cephadm or the Rook orchestrator module is
+      enabled.
+
+      To see which orchestrator module is enabled, run:
+
+      ceph orch status
+    questions_and_answers:
+      - question: |
+          How can I make a drive's LED blink for easier replacement?
+        answer: |
+          Use the command `device light on|off <devid> [ident|fault] [--force]`.
+      - question: |
+          Why might the LED blinking command not work?
+        answer: |
+          It might not work depending on your kernel revision, SES firmware, or HBA setup.
+      - question: |
+          How can I check if the Ceph orchestrator module is enabled?
+        answer: |
+          Run the command `ceph orch status` to check the orchestrator module.
+
+  - context: |
+      Ceph can also monitor the health metrics associated with your device.
+      For example, SATA drives implement a standard called SMART that provides
+      a wide range of internal metrics about the device's usage and health.
+      Other device types such as SAS and NVMe present a similar set of metrics
+      (via slightly different standards). All of these metrics can be collected
+      by Ceph via the `smartctl` tool.
+
+      You can enable or disable health monitoring by running one of the following commands:
+
+      ceph device monitoring on
+      ceph device monitoring off
+
+      If monitoring is enabled, device metrics will be scraped automatically
+      at regular intervals. To configure that interval, run:
+
+      ceph config set mgr mgr/devicehealth/scrape_frequency <seconds>
+
+      By default, device metrics are scraped once every 24 hours.
+
+      To manually scrape all devices, run:
+
+      ceph device scrape-health-metrics
+
+      To scrape a single device, run:
+
+      ceph device scrape-health-metrics <device-id>
+
+      To scrape a single daemon's devices, run:
+
+      ceph device scrape-daemon-health-metrics <who>
+    questions_and_answers:
+      - question: |
+          What tool does Ceph use to collect health metrics from devices?
+        answer: |
+          Ceph uses the `smartctl` tool to collect health metrics.
+      - question: |
+          How can I enable or disable health monitoring in Ceph?
+        answer: |
+          You can enable or disable health monitoring with `ceph device monitoring on` or `ceph device monitoring off`.
+      - question: |
+          How often are device metrics scraped by default?
+        answer: |
+          Device metrics are scraped every 24 hours by default.
+
+  - context: |
+      Ceph can predict drive life expectancy and device failures by analyzing
+      the health metrics that it collects. The prediction modes are as follows:
+
+      - *none*: disable device failure prediction.
+      - *local*: use a pre-trained prediction model from the `ceph-mgr` daemon.
+
+      To configure the prediction mode, run:
+
+      ceph config set global device_failure_prediction_mode <mode>
+
+      Under normal conditions, failure prediction runs periodically in the background.
+      For this reason, life expectancy values might be populated only after a
+      significant amount of time has passed. The life expectancy of all devices
+      is displayed in the output of the command:
+
+      ceph device ls
+
+      To see the metadata of a specific device, run:
+
+      ceph device info <devid>
+
+      To explicitly force prediction of a specific device's life expectancy, run:
+
+      ceph device predict-life-expectancy <devid>
+
+      To inform Ceph of a specific device's life expectancy, run:
+
+      ceph device set-life-expectancy <devid> <from> [<to>]
+
+      Life expectancies are expressed as a time interval, and the end can be unspecified.
+
+      The `mgr/devicehealth/warn_threshold` configuration option controls the
+      health check for an expected device failure. If the device is expected
+      to fail within the specified time interval, an alert is raised.
+
+      To check the stored life expectancy of all devices and generate any
+      appropriate health alert, run:
+
+      ceph device check-health
+
+      The `mgr/devicehealth/self_heal` option (enabled by default) automatically
+      migrates data away from devices that are expected to fail soon. If this
+      option is enabled, the module marks such devices `out` so that automatic
+      migration will occur.
+    questions_and_answers:
+      - question: |
+          What modes are available for device failure prediction in Ceph?
+        answer: |
+          The available modes are *none* to disable prediction and *local* to use a pre-trained model.
+      - question: |
+          How do I enable device failure prediction in Ceph?
+        answer: |
+          You can enable failure prediction by setting the mode with `ceph config set global device_failure_prediction_mode <mode>`
+      - question: |
+          How does Ceph inform users about failing devices?
+        answer: |
+          Ceph raises alerts if a device is expected to fail within a specified time interval.
+document_outline: Teach the Large Language Model about the devices Module
+document:
+  repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
+  commit: b60d0d0
+  patterns: [/upstream/doc/rados/operations/devices.md]

@@ -1,0 +1,4 @@
+Title of work: Devices Module
+Link to work: https://docs.ceph.com/en/latest/rados/operations/devices/?highlight=devices
+License of the work: Apache 2.0
+Creators name: Pentakota Divya Gowri
