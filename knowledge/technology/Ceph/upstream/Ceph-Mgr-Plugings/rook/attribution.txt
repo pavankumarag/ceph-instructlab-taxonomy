@@ -1,0 +1,4 @@
+Title of work: Rook integration with Ceph
+Link to work: https://docs.ceph.com/en/latest/mgr/rook/
+License of the work: Apache 2.0
+Creators name: Maryam Khan

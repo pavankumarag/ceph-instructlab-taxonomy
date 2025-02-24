@@ -1,0 +1,142 @@
+version: 3
+created_by: Maryam Khan
+domain: ceph_orchestration
+seed_examples:
+  - context: |
+      Overview of Rook
+      Rook (https://rook.io/) is an orchestration tool that enables Ceph to run inside a Kubernetes cluster.
+      The rook module provides integration between:
+      - Ceph's Orchestrator Framework (used by other Ceph modules such as the dashboard)
+      - Rook, allowing Ceph services to be managed within Kubernetes.
+      Key Features:
+      - Simplifies Ceph deployment and management in Kubernetes.
+      - Allows dynamic scaling and self-healing of Ceph clusters.
+      - Uses Kubernetes' declarative configuration to automate storage provisioning.
+      Orchestrator Role in Rook:
+      - Ceph's orchestrator modules provide backend services to other Ceph modules.
+      - The rook module acts as an interface between the orchestrator and Kubernetes.
+      - To interact with Rook, users can utilize the Orchestrator CLI module.
+    questions_and_answers:
+      - question: |
+          What is Rook in Ceph?
+        answer: |
+          Rook is an orchestration tool that enables Ceph to run inside a Kubernetes cluster, managing storage services dynamically.
+      - question: |
+          What does the Rook module do in Ceph?
+        answer: |
+          The Rook module integrates Ceph's Orchestrator Framework with Kubernetes, allowing Ceph services to be managed via Rook.
+      - question: |
+          How can users interact with Rook in Ceph?
+        answer: |
+          Users can interact with Rook through Ceph's Orchestrator CLI module, which provides a command-line interface for managing cluster services.
+
+  - context: |
+      Requirements for Rook
+      To use Rook with Ceph, the following requirements must be met:
+      1. Ceph Services:
+         - A running ceph-mon (Ceph Monitor) service.
+         - A running ceph-mgr (Ceph Manager) service.
+         - Both services must be deployed via Rook inside Kubernetes.
+      2. Rook Version:
+         - Rook 0.9 or newer is required.
+      3. Kubernetes Environment:
+         - Rook must be deployed inside a Kubernetes cluster.
+         - The cluster should have adequate resources to support Ceph services.
+    questions_and_answers:
+      - question: |
+          What Ceph services are required for Rook to function?
+        answer: |
+          Rook requires ceph-mon (Monitor) and ceph-mgr (Manager) services to be running inside Kubernetes.
+      - question: |
+          What is the minimum Rook version required for Ceph integration?
+        answer: |
+          Rook 0.9 or newer is required for Ceph integration.
+      - question: |
+          Where should Rook be deployed?
+        answer: |
+          Rook must be deployed inside a Kubernetes cluster to orchestrate Ceph storage services.
+
+  - context: |
+      Configuring Rook in Ceph
+      - In Rook, ceph-mgr runs as a Kubernetes pod.
+      - Because of this, the Rook module connects to the Kubernetes API automatically, without requiring explicit configuration.
+      - The Kubernetes API allows Ceph to:
+        - Manage storage resources dynamically.
+        - Automate scaling and failover.
+        - Provide seamless integration with Kubernetes-native tools.
+    questions_and_answers:
+      - question: |
+          How does the Rook module connect to the Kubernetes API?
+        answer: |
+          Since Ceph's ceph-mgr runs as a Kubernetes pod, the Rook module connects to the Kubernetes API automatically without explicit configuration.
+      - question: |
+          What are the benefits of Rook's Kubernetes API integration?
+        answer: |
+          - Automated storage management
+          - Dynamic scaling of Ceph clusters
+          - Failover handling and self-healing
+          - Seamless Kubernetes integration
+      - question: |
+          Does Rook require manual configuration to connect to Kubernetes?
+        answer: |
+          No, Rook automatically integrates with Kubernetes through the ceph-mgr pod.
+
+  - context: |
+      Rook Development
+      - Developers who wish to work on Rook with Ceph should refer to the kubernetes-dev documentation.
+      - This guide provides instructions on:
+        - Setting up a development environment.
+        - Testing and debugging Rook's integration with Ceph.
+        - Contributing to Rook's open-source development.
+    questions_and_answers:
+      - question: |
+          Where can developers find resources to work on Rook?
+        answer: |
+          Developers should refer to the kubernetes-dev documentation for instructions on setting up a development environment.
+      - question: |
+          What does the kubernetes-dev guide provide?
+        answer: |
+          The guide includes:
+          - Development environment setup
+          - Testing and debugging procedures
+          - Contribution guidelines for Rook's integration with Ceph
+      - question: |
+          How can developers contribute to Rook’s integration with Ceph?
+        answer: |
+          Developers can contribute by setting up a dev environment, testing integration, and following Rook’s open-source contribution guidelines.
+
+  - context: |
+      Troubleshooting Rook in Ceph
+      - Common issues when running Rook with Ceph:
+        - Pods stuck in a pending state due to insufficient resources.
+        - Rook Operator logs showing errors related to Ceph cluster connectivity.
+        - Storage provisioning failures due to misconfigured Kubernetes storage classes.
+      - Recommended solutions:
+        - Ensure adequate CPU, memory, and storage for Ceph pods.
+        - Check logs using `kubectl logs <rook-operator-pod>` for debugging.
+        - Verify Kubernetes storage classes are correctly configured.
+    questions_and_answers:
+      - question: |
+          What are common issues when running Rook with Ceph?
+        answer: |
+          - Pods stuck in a pending state due to resource constraints.
+          - Errors in Rook Operator logs related to cluster connectivity.
+          - Storage provisioning failures due to misconfigured storage classes.
+      - question: |
+          How can I check Rook Operator logs for debugging?
+        answer: |
+          Use the command:
+          ```bash
+          kubectl logs <rook-operator-pod>
+          ```
+          This helps identify errors related to Ceph integration.
+      - question: |
+          How can I fix Rook pods stuck in a pending state?
+        answer: |
+          Ensure that the Kubernetes cluster has sufficient CPU, memory, and storage resources available for Ceph pods.
+
+document_outline: Teach the Large Language Model about the Rook integration with Ceph.
+document:
+  repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
+  commit: b60d0d0
+  patterns: [upstream/doc/mgr/rook.md]

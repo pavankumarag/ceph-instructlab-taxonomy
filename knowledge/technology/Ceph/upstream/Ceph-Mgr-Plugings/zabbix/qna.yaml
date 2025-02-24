@@ -1,0 +1,171 @@
+version: 3
+created_by: Maryam Khan
+domain: ceph_monitoring
+seed_examples:
+  - context: |
+      Zabbix Module Overview
+      The Zabbix module for Ceph was deprecated as of April 2020. However, in April 2024, the Ceph community introduced procedures for installing and configuring Zabbix 2 to monitor Ceph clusters.
+      Why was Zabbix support discontinued?
+      - Ceph maintainers decided to stop support due to maintenance complexity and lack of contributors.
+      - The community now provides a self-managed approach using Zabbix 2.
+      New Zabbix Integration
+      - Users can follow installation steps for:
+        - Ceph MGR Nodes
+        - Ceph Cluster
+        - Zabbix Server
+    questions_and_answers:
+      - question: |
+          Why was support for Zabbix in Ceph discontinued?
+        answer: |
+          Zabbix support was removed in April 2020 due to maintenance complexity, lack of contributors, and the availability of alternative monitoring solutions.
+      - question: |
+          What is the alternative to the deprecated Zabbix module?
+        answer: |
+          The Ceph community developed procedures in April 2024 for installing and using Zabbix 2 to monitor Ceph clusters.
+      - question: |
+          What are the key components of the new Zabbix integration?
+        answer: |
+          The integration consists of:
+          1. Installing Zabbix-Agent 2 on Ceph MGR Nodes.
+          2. Configuring Ceph Cluster monitoring via the RESTful module.
+          3. Setting up a Zabbix Server for data collection and visualization.
+  - context: |
+      Installing Zabbix-Agent 2 on Ceph MGR Nodes
+      To monitor Ceph, install `zabbix-agent2` on Ceph MGR nodes:
+      Steps:
+      1. Download Zabbix from https://www.zabbix.com/download or use the Zabbix repository.
+      2. Remove existing Zabbix agents.
+      3. Install `zabbix-agent2` using the package manager.
+      4. Edit `/etc/zabbix/zabbix-agent2.conf`:
+         ```text
+         Server=127.0.0.1,zabbix2.example.com,zabbix1.example.com
+         ```
+      5. Restart the agent:
+         ```bash
+         systemctl restart zabbix-agent2
+         ```
+    questions_and_answers:
+      - question: |
+          How can I install Zabbix-Agent 2 on Ceph MGR nodes?
+        answer: |
+          1. Download Zabbix from the official website or repository.
+          2. Remove any older Zabbix agents.
+          3. Install `zabbix-agent2` using a package manager.
+          4. Edit `/etc/zabbix/zabbix-agent2.conf` to specify monitoring servers.
+          5. Restart the agent using `systemctl restart zabbix-agent2`.
+      - question: |
+          What configuration changes are required in `zabbix-agent2.conf`?
+        answer: |
+          The `Server` line must be updated to include the Zabbix monitoring servers:
+          ```text
+          Server=127.0.0.1,zabbix2.example.com,zabbix1.example.com
+          ```
+      - question: |
+          What command is used to restart Zabbix-Agent 2 after installation?
+        answer: |
+          The command to restart Zabbix-Agent 2 is:
+          ```bash
+          systemctl restart zabbix-agent2
+          ```
+  - context: |
+      Configuring Ceph Cluster for Zabbix Monitoring
+      The Ceph cluster must be configured to expose metrics for Zabbix.
+      Steps:
+      1. Enable the RESTful module:
+         ```bash
+         ceph mgr module enable restful
+         ```
+      2. (Optional) Generate a self-signed certificate:
+         ```bash
+         restful create-self-signed-cert
+         ```
+      3. Create an API user for Zabbix:
+         ```bash
+         ceph restful create-key zabbix-monitor
+         ```
+      4. Save the generated API key for later use.
+    questions_and_answers:
+      - question: |
+          How do I enable the RESTful module for Ceph-Zabbix integration?
+        answer: |
+          Use the following command:
+          ```bash
+          ceph mgr module enable restful
+          ```
+      - question: |
+          How can I generate a self-signed certificate for Zabbix monitoring?
+        answer: |
+          You can generate a self-signed certificate using:
+          ```bash
+          restful create-self-signed-cert
+          ```
+          This step is optional.
+      - question: |
+          What is the purpose of creating an API key in Ceph for Zabbix?
+        answer: |
+          The API key is required for Zabbix to authenticate and retrieve Ceph metrics.
+  - context: |
+      Testing API Access for Zabbix Monitoring
+      You can test Zabbix's access to Ceph metrics using `zabbix_get`.
+      Command Syntax:
+      ```bash
+      zabbix_get -s 127.0.0.1 -k ceph.ping["<CEPH.CONNSTRING>","<CEPH.USER>","<CEPH.API.KEY>"]
+      ```
+      Example:
+      ```bash
+      zabbix_get -s 127.0.0.1 -k ceph.ping["https://localhost:8003","zabbix-monitor","a4bb2019-XXXX-YYYY-ZZZZ-abcdefghij"]
+      ```
+    questions_and_answers:
+      - question: |
+          How do I test if Zabbix can access Ceph metrics?
+        answer: |
+          Use the `zabbix_get` command:
+          ```bash
+          zabbix_get -s 127.0.0.1 -k ceph.ping["https://localhost:8003","zabbix-monitor","<API_KEY>"]
+          ```
+      - question: |
+          What does the API key in `zabbix_get` represent?
+        answer: |
+          The API key is used for authentication when fetching Ceph metrics via Zabbix.
+      - question: |
+          What should I do if `zabbix_get` is not found?
+        answer: |
+          You may need to install `zabbix-get` using your package manager.
+  - context: |
+      Configuring Zabbix Server for Ceph Monitoring
+      After setting up Zabbix-Agent 2 and the Ceph cluster, configure the Zabbix server:
+      Steps:
+      1. Create a host for the Ceph monitoring server.
+      2. Add the template Ceph by Zabbix Agent 2.
+      3. Configure the host macros:
+         - Set `{$CEPH.API.KEY}` to the generated API key.
+         - Set `{$CEPH.USER}` to the Zabbix API user.
+      Example Macro Configuration:
+      ```text
+      {$CEPH.API.KEY} a4bb2019-XXXX-YYYY-ZZZZ-abcdefghij
+      {$CEPH.USER} zabbix-monitor
+      ```
+    questions_and_answers:
+      - question: |
+          What steps are required to configure the Zabbix Server for Ceph?
+        answer: |
+          1. Create a new host for the Ceph monitoring server.
+          2. Add the Ceph by Zabbix Agent 2 template.
+          3. Configure macros with the API key and user credentials.
+      - question: |
+          What macros need to be set for Zabbix to retrieve Ceph data?
+        answer: |
+          The following macros should be configured:
+          ```text
+          {$CEPH.API.KEY} <your-generated-api-key>
+          {$CEPH.USER} zabbix-monitor
+          ```
+      - question: |
+          How long does it take for data to appear in Zabbix after configuration?
+        answer: |
+          It may take a few monitoring cycles before Ceph data is visible in Zabbix.
+document_outline: Teach the Large Language Model about the Zabbix module integration in Ceph.
+document:
+  repo: git@github.com:pavankumarag/ceph-instructlab-taxonomy-data.git
+  commit: b60d0d0
+  patterns: [upstream/doc/mgr/zabbix.md]
